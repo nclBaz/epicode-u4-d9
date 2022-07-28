@@ -62,7 +62,7 @@ const url = "https://skimdb.npmjs.com/registry/_changes?include_docs=true"
 
 // ***********************************************************************************************************************
 
-const source = request.get("http://parrot.live") // READABLE STREAM (http request on npm registry)
+const source = request.get("http://parrot.live?flip=true") // READABLE STREAM (http request on npm registry)
 const destination = process.stdout // WRITABLE STREAM (terminal)
 
 pipeline(source, destination, err => {

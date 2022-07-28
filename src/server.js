@@ -8,11 +8,14 @@ import booksRouter from "./apis/books/index.js"
 import filesRouter from "./apis/files/index.js"
 import { badRequestHandler, notFoundHandler, unauthorizedHandler, genericServerErrorHandler } from "./errorHandlers.js"
 import createHttpError from "http-errors"
+import swagger from "swagger-ui-express"
+import yaml from "yamljs"
 
 const server = express()
 
 const port = process.env.PORT || 3001
 const publicFolderPath = join(process.cwd(), "./public")
+const yamlFile = yaml.load(join(process.cwd(), "./src/docs/epicBooksDefinitions.yml"))
 
 // *************************************** MIDDLEWARES ***********************************
 
@@ -58,6 +61,7 @@ server.use(express.json()) // GLOBAL MIDDLEWARE If you don't add this line BEFOR
 server.use("/users", usersRouter) // /users will be the prefix that all the endpoints in the usersRouter will have
 server.use("/books", booksRouter) // ROUTER LEVEL MIDDLEWARE
 server.use("/files", filesRouter)
+server.use("/docs", swagger.serve, swagger.setup(yamlFile)) // swagger can generate an interactive webpage for your documentation by using the yaml file
 
 // ************************************** ERROR HANDLERS *********************************
 
