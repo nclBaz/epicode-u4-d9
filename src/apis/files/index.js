@@ -5,6 +5,8 @@ import { v2 as cloudinary } from "cloudinary"
 import { CloudinaryStorage } from "multer-storage-cloudinary"
 import { pipeline } from "stream"
 import { createGzip } from "zlib"
+import json2csv from "json2csv"
+
 import { getBooks, getBooksReadableStream, saveUsersAvatars } from "../../lib/fs-tools.js"
 import { getPDFReadableStream } from "../../lib/pdf-tools.js"
 
@@ -89,6 +91,22 @@ filesRouter.get("/PDF", async (req, res, next) => {
     const source = getPDFReadableStream(books)
     const destination = res
     pipeline(source, destination, err => {
+      if (err) console.log(err)
+    })
+  } catch (error) {
+    next(error)
+  }
+})
+
+filesRouter.get("/CSV", (req, res, next) => {
+  try {
+    // SOURCE (books.json) --> TRANSFORM (json into csv) --> DESTINATION (response)
+    res.setHeader("Content-Disposition", "attachment; filename=books.csv") // This header tells the browser to open the "save file on disk" dialog
+    const source = getBooksReadableStream()
+    const destination = res
+    const transform = new json2csv.Transform({ fields: ["asin", "title", "category"] })
+
+    pipeline(source, transform, destination, err => {
       if (err) console.log(err)
     })
   } catch (error) {
