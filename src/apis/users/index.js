@@ -17,6 +17,7 @@ import { dirname, join } from "path" // CORE MODULE
 import uniqid from "uniqid"
 import { getUsers } from "../../lib/fs-tools.js"
 import multer from "multer"
+import { sendRegistrationEmail } from "../../lib/email-tools.js"
 
 const usersRouter = express.Router() // a router is a set of similar endpoints grouped together
 
@@ -135,4 +136,16 @@ usersRouter.patch("/:userId/avatar", multer().single("avatar"), async (req, res,
   }
 })
 
+usersRouter.post("/register", async (req, res, next) => {
+  try {
+    // 1. receive user's data from req.body
+    const { email } = req.body
+    // 2. save new user in db
+    // 3. send email to new user
+    await sendRegistrationEmail(email)
+    res.send({ message: "User registered and email sent!" })
+  } catch (error) {
+    next(error)
+  }
+})
 export default usersRouter // do not forget to export it!
