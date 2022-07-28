@@ -8,7 +8,7 @@ import { createGzip } from "zlib"
 import json2csv from "json2csv"
 
 import { getBooks, getBooksReadableStream, saveUsersAvatars } from "../../lib/fs-tools.js"
-import { getPDFReadableStream } from "../../lib/pdf-tools.js"
+import { getPDFReadableStream, generatePDFAsync } from "../../lib/pdf-tools.js"
 
 const cloudinaryUploader = multer({
   storage: new CloudinaryStorage({
@@ -109,6 +109,17 @@ filesRouter.get("/CSV", (req, res, next) => {
     pipeline(source, transform, destination, err => {
       if (err) console.log(err)
     })
+  } catch (error) {
+    next(error)
+  }
+})
+
+filesRouter.get("/asyncPDF", async (req, res, next) => {
+  try {
+    const books = await getBooks()
+    const file = await generatePDFAsync(books)
+    // await sendEmailWithAttachment(file)
+    res.send()
   } catch (error) {
     next(error)
   }
